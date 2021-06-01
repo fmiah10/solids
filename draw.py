@@ -5,32 +5,32 @@ import random
 
 def scanline_convert(polygons, i, screen, zbuffer ):
     #find top, bottom, middle points
-    maxY = max( (int(polygons[i][1])), (int(polygons[i+1][1])), (int(polygons[i+2][1])))
-    minY = min( (int(polygons[i][1])), (int(polygons[i+1][1])), (int(polygons[i+2][1])))
-    if (int(polygons[i][1]) == maxY and int(polygons[i+1][1]) == minY):
+    maxY = max( (polygons[i][1]), (polygons[i+1][1]), (polygons[i+2][1]) )
+    minY = min( (polygons[i][1]), (polygons[i+1][1]), (polygons[i+2][1]) )
+
+    t = []
+    b = []
+    m = []
+    #determine top vertex
+    if (polygons[i][1] == maxY):
         t = polygons[i]
-        b = polygons[i+1]
-        m = polygons[i+2]
-    elif (int(polygons[i][1]) == maxY and int(polygons[i+2][1]) == minY):
-        t = polygons[i]
-        b = polygons[i+2]
-        m = polygons[i+1]
-    elif (int(polygons[i+1][1]) == maxY and int(polygons[i][1]) == minY):
+    elif (polygons[i+1][1] == maxY):
         t = polygons[i+1]
-        b = polygons[i]
-        m = polygons[i+2]
-    elif (int(polygons[i+1][1]) == maxY and int(polygons[i+2][1]) == minY):
-        t = polygons[i+1]
-        b = polygons[i+2]
-        m = polygons[i]
-    elif (int(polygons[i+2][1]) == maxY and int(polygons[i][1]) == minY):
+    elif (polygons[i+2][1] == maxY):
         t = polygons[i+2]
+
+    #determine bottom vertex
+    if (polygons[i][1] == minY):
         b = polygons[i]
-        m = polygons[i+1]
-    elif (int(polygons[i+2][1]) == maxY and int(polygons[i+1][1]) == minY):
-        t = polygons[i+2]
+    elif (polygons[i+1][1] == minY):
         b = polygons[i+1]
-        m = polygons[i]
+    elif (polygons[i+2][1] == minY):
+        b = polygons[i+2]
+
+    #determine middle vertex
+    for v in [polygons[i], polygons[i+1], polygons[i+2]]:
+        if (v != t) and (v != b):
+            m = v
 
     xt = t[0]
     xb = b[0]
@@ -44,40 +44,43 @@ def scanline_convert(polygons, i, screen, zbuffer ):
 
     x0 = xb
     x1 = xb
-    y0 = yb
+    z0 = zb
+    z1 = zb
 
-    if (yt - yb != 0):
-        dx0 = (xt - xb) / (yt - yb)
-    else:
-        dx0 = None
+    dx0 = (xt - xb)/(yt - yb + 1)
+    dz0 = (zt - zb)/(yt - yb + 1)
 
-    if (ym - yb != 0):
-        dx1 = (xm - xb) / (ym - yb)
+    if (int(ym) - int(yb) != 0):
+        dx1 = (xm - xb)/(ym - yb + 1)
+        dz1 = (zm - zb)/(ym - yb + 1)
     else:
-        dx1 = None
+        dx1 = 0
+        dz1 = 0
 
-    if (yt - ym != 0):
-        dx1_1 = (xt - xm) / (yt - ym)
+    if (int(yt) - int(ym) != 0):
+        dx1_1 = (xt - xm)/(yt - ym + 1)
+        dz1_1 = (zt - zm)/(yt - ym + 1)
     else:
-        dx1_1 = None
+        dx1_1 = 0
+        dz1_1 = 0
 
     y = yb
-
     color = [random.randint(0, 256), random.randint(0, 256), random.randint(0, 256)]
     while y <= yt:
-        draw_line( x0, y, x0, x1, y, x1, screen, zbuffer, color )
-
-        #move the endpoints
-        if dx0 != None:
-            x0 += dx0
-        if dx1 != None:
-            x1 += dx1
-        y += 1
-
         #swap dx1 if needed
         if y >= ym:
             dx1 = dx1_1
+            dz1 = dz1_1
             x1 = xm
+
+        draw_line( x0, y, z0, x1, y, z1, screen, zbuffer, color )
+
+        #move the endpoints
+        x0 += dx0
+        x1 += dx1
+        z0 += dz0
+        z1 += dz1
+        y += 1
 
 
 
