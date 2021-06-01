@@ -68,7 +68,7 @@ def scanline_convert(polygons, i, screen, zbuffer ):
     color = [random.randint(0, 256), random.randint(0, 256), random.randint(0, 256)]
     while y <= yt:
         #swap dx1 if needed
-        if y >= ym:
+        if int(y) == int(ym):
             dx1 = dx1_1
             dz1 = dz1_1
             x1 = xm
