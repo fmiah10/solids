@@ -38,6 +38,9 @@ def scanline_convert(polygons, i, screen, zbuffer ):
     yt = t[1]
     yb = b[1]
     ym = m[1]
+    zt = t[2]
+    zb = b[2]
+    zm = m[2]
 
     x0 = xb
     x1 = xb
@@ -94,7 +97,6 @@ def draw_polygons( polygons, screen, zbuffer, color ):
         normal = calculate_normal(polygons, point)[:]
         #print normal
         if normal[2] > 0:
-            i = 0
             scanline_convert(polygons, point, screen, zbuffer )
             '''draw_line( int(polygons[point][0]),
                        int(polygons[point][1]),
